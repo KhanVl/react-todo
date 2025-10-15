@@ -4,7 +4,7 @@ import Task from './Task'
 function TaskList({ tasks }) {
   return (
     <ul className="todo-list">
-      {tasks.map(t => (
+      {tasks.map((t) => (
         <Task
           key={t.id}
           id={t.id}
