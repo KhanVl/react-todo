@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { format } from 'date-fns'
 
 function Task({ id, title, completed, createdAt, onToggle, onDelete, onEditTitle }) {
@@ -10,22 +10,20 @@ function Task({ id, title, completed, createdAt, onToggle, onDelete, onEditTitle
     if (isEditing && inputRef.current) inputRef.current.focus()
   }, [isEditing])
 
-  const createdLabel = format(createdAt, 'PPpp') 
+  const createdLabel = format(createdAt, 'PPpp') // «created X minutes ago» — позже
 
-  const handleEditStart = () => {
+  const startEdit = () => {
     setDraft(title)
     setIsEditing(true)
   }
-
-  const handleEditConfirm = () => {
+  const confirmEdit = () => {
     if (draft.trim()) onEditTitle(id, draft)
     setIsEditing(false)
   }
-
-  const handleKeyDown = (e) => {
+  const onKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      handleEditConfirm()
+      confirmEdit()
     } else if (e.key === 'Escape') {
       setIsEditing(false)
       setDraft(title)
@@ -42,14 +40,14 @@ function Task({ id, title, completed, createdAt, onToggle, onDelete, onEditTitle
           onChange={() => onToggle(id)}
         />
 
-        {!isEditing ? (
-          <label onDoubleClick={handleEditStart}>
+        {!isEditing && (
+          <label onDoubleClick={startEdit}>
             <span className="description">{title}</span>
             <span className="created">{createdLabel}</span>
           </label>
-        ) : null}
+        )}
 
-        <button className="icon icon-edit" aria-label="edit" onClick={handleEditStart} />
+        <button className="icon icon-edit" aria-label="edit" onClick={startEdit} />
         <button className="icon icon-destroy" aria-label="delete" onClick={() => onDelete(id)} />
       </div>
 
@@ -59,7 +57,7 @@ function Task({ id, title, completed, createdAt, onToggle, onDelete, onEditTitle
           className="edit"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={onKeyDown}
           onBlur={() => setIsEditing(false)}
         />
       )}
