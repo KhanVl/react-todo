@@ -1,26 +1,32 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
 function NewTaskForm({ onAddTask }) {
   const [value, setValue] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onAddTask(value)
+    const v = value.trim()
+    if (!v) return
+    onAddTask(v)
     setValue('')
   }
 
   return (
     <form className="new-todo-form" onSubmit={handleSubmit}>
-      <input
-        className="new-todo"
-        placeholder="What needs to be done?"
-        autoFocus
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <button type="submit" className="visually-hidden">Add</button>
+      <div className="input-row">
+        <input
+          className="new-todo"
+          placeholder="What needs to be done?"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <button type="submit" className="btn-add">Add</button>
+      </div>
     </form>
   )
 }
+NewTaskForm.propTypes = { onAddTask: PropTypes.func }
+NewTaskForm.defaultProps = { onAddTask: () => {} }
 
 export default NewTaskForm

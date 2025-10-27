@@ -1,33 +1,34 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { format } from 'date-fns'
+import PropTypes from 'prop-types'
+import { formatDistanceToNow } from 'date-fns'
 
 function Task({ id, title, completed, createdAt, onToggle, onDelete, onEditTitle }) {
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(title)
   const inputRef = useRef(null)
+  const [, forceTick] = useState(0) 
 
   useEffect(() => {
     if (isEditing && inputRef.current) inputRef.current.focus()
   }, [isEditing])
 
-  const createdLabel = format(createdAt, 'PPpp') // «created X minutes ago» — позже
+  useEffect(() => {
+    const id = setInterval(() => forceTick(x => x + 1), 30_000)
+    return () => clearInterval(id)
+  }, [])
 
   const startEdit = () => {
     setDraft(title)
     setIsEditing(true)
   }
   const confirmEdit = () => {
-    if (draft.trim()) onEditTitle(id, draft)
+    const t = draft.trim()
+    if (t) onEditTitle(id, t)
     setIsEditing(false)
   }
   const onKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      confirmEdit()
-    } else if (e.key === 'Escape') {
-      setIsEditing(false)
-      setDraft(title)
-    }
+    if (e.key === 'Enter') { e.preventDefault(); confirmEdit() }
+    if (e.key === 'Escape') { setIsEditing(false); setDraft(title) }
   }
 
   return (
@@ -43,7 +44,9 @@ function Task({ id, title, completed, createdAt, onToggle, onDelete, onEditTitle
         {!isEditing && (
           <label onDoubleClick={startEdit}>
             <span className="description">{title}</span>
-            <span className="created">{createdLabel}</span>
+            <span className="created">
+              {`created ${formatDistanceToNow(createdAt, { addSuffix: true })}`}
+            </span>
           </label>
         )}
 
@@ -63,6 +66,23 @@ function Task({ id, title, completed, createdAt, onToggle, onDelete, onEditTitle
       )}
     </li>
   )
+}
+
+Task.propTypes = {
+  id: PropTypes.number.isRequired,
+  title: PropTypes.string,
+  completed: PropTypes.bool,
+  createdAt: PropTypes.instanceOf(Date).isRequired,
+  onToggle: PropTypes.func,
+  onDelete: PropTypes.func,
+  onEditTitle: PropTypes.func
+}
+Task.defaultProps = {
+  title: '',
+  completed: false,
+  onToggle: () => {},
+  onDelete: () => {},
+  onEditTitle: () => {}
 }
 
 export default Task
