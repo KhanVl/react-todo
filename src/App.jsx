@@ -55,7 +55,7 @@ function App() {
     <section className="todoapp">
       <header className="header">
         <h1>todos</h1>
-        <div class="subtitle">Add tasks, then filter and manage them.</div>
+        <div className="subtitle">Add tasks, then filter and manage them.</div>
         <NewTaskForm onAddTask={addTask} />
       </header>
 
